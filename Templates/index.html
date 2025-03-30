@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Downloader</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h2>Download Any Video</h2>
+        <input type="text" id="videoUrl" placeholder="Enter video URL here">
+        <button onclick="downloadVideo()">Download</button>
+        
+        <div id="progress-container">
+            <p id="message"></p>
+            <div class="progress-bar">
+                <div class="progress"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function downloadVideo() {
+            const url = document.getElementById('videoUrl').value;
+            const message = document.getElementById('message');
+            const progressBar = document.querySelector('.progress');
+
+            if (!url) {
+                message.innerText = 'Please enter a video URL';
+                return;
+            }
+
+            message.innerText = 'Downloading...';
+            progressBar.style.width = "10%";
+
+            fetch(`/download?url=${encodeURIComponent(url)}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Download failed');
+                    }
+                    return response.blob();
+                })
+                .then(blob => {
+                    progressBar.style.width = "100%";
+                    message.innerText = 'Download complete!';
+
+                    const link = document.createElement('a');
+                    link.href = window.URL.createObjectURL(blob);
+                    link.download = "video.mp4";
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                })
+                .catch(error => {
+                    message.innerText = 'Error: ' + error.message;
+                    progressBar.style.width = "0%";
+                });
+        }
+    </script>
+</body>
+</html>
