@@ -42,7 +42,7 @@ app = Flask(__name__, template_folder="templates", static_folder="static")
 download_folder = "downloads"
 os.makedirs(download_folder, exist_ok=True)
 
-@app.route('/')
+@app.route('/', methods=['GET','Head'])
 def home():
     return render_template("index.html")
 
